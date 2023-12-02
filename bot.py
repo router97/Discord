@@ -7,4 +7,4 @@ from openai import OpenAI
 # VARIABLES
 intents = Intents.all()
 bot = Bot(command_prefix = config['prefix'], intents = intents)
-ai_client = OpenAI(api_key=config['openai_token'])
+# ai_client = OpenAI(api_key=config['openai_token'])

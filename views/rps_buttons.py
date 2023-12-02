@@ -8,7 +8,7 @@ from discord.ext import commands
 from bot import bot
 from random import choice
 
-from bot import ai_client
+# from bot import ai_client
 
 # BUTTONS
 class RPS_Buttons(discord.ui.View):
@@ -59,35 +59,9 @@ class RPS_Buttons(discord.ui.View):
             # Accept interaction
             await interaction.response.defer()
             
-            # AI Generate a response, if the player is the bot
+            # Generate a response, if the player is the bot
             if self.user2 == bot.user:
-                messages = '\n'.join(reversed([f'{msg.author.display_name}: {msg.content}\n' async for msg in interaction.channel.history(limit=20)]))
-                prompt = f'You are a discord bot, you are being played against in a rock, paper, scissors game. You HAVE TO respond with simply "rock", "paper" or "scissors", nothing else. based on what i give you next. The user you are playing against is {self.user1.display_name}, The chat history is\n{messages}'
-                bot_response = ''
-                try:
-                    response = ai_client.completions.create(
-                        model="text-davinci-003",
-                        prompt=prompt,
-                        max_tokens=150,
-                        temperature=0,
-                        user=interaction.user.display_name
-                    )
-                except Exception as e:
-                    print(f'Error while generating the response: {e}')
-                if bot_response:
-                    bot_response = response.choices[0].text.strip().casefold()
-                    bot_response = bot_response.replace(f'{bot.user.display_name}: ', '').replace(f'{bot.user.display_name.casefold()}: ', '')
-                    bot_response = bot_response.replace('.', '')
-                    
-                    if bot_response in ('rock', 'paper', 'scissors'):
-                        print('BOT AI PICKED')
-                        self.pick.update({bot.user: bot_response})
-                    else:
-                        print("responded, but wrong:", bot_response)
-                        self.pick.update({bot.user: choice(['rock', 'paper', 'scissors'])})
-                else:
-                    print("bot didn't respond")
-                    self.pick.update({bot.user: choice(['rock', 'paper', 'scissors'])})
+                self.pick.update({self.user2: choice(['rock', 'paper', 'scissors'])})
                 
             # Save the pick
             self.pick.update({interaction.user: pick})

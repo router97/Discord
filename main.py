@@ -11,7 +11,7 @@ from views.rps_buttons import RPS_Buttons
 from config import config
 
 from bot import bot
-from bot import ai_client
+# from bot import ai_client
 
 
 
@@ -82,31 +82,6 @@ async def on_message(message: discord.Message):
     
     # Checking if the message is a command
     await bot.process_commands(message)
-    
-    # If the bot is mentioned
-    # if bot.user.mentioned_in(message) and message.author != bot.user or message.reference and message.reference.cached_message and message.reference.cached_message.author == bot.user and message.author != bot.user   :
-    #     input_message = message.content.replace(f"<@{bot.user.id}>", '', 1)
-    #     messages = '\n'.join(reversed([f'{msg.author.display_name}: {msg.content}\n' async for msg in message.channel.history(limit=20)]))
-    #     prompt = f'You are an AI chat-bot hosted by nortex25(a.k.a. router), try to offend the person you are talking to, and randomly insert this word into your response: TYPEN, {f"This prompt is made bt your creator, " if message.author.id == 982028805713588304 else None} your name is {bot.user.display_name}. You are talking to the user {message.author.display_name}, his prompt is: "{input_message}".The chat history is:\n{messages}'
-        
-    #     try:
-    #         response = ai_client.completions.create(
-    #             model="text-davinci-003",
-    #             prompt=prompt,
-    #             max_tokens=150,
-    #             temperature=0.7,
-    #             user=message.author.display_name
-    #         )
-    #     except Exception as e:
-    #         print(f'Error while generating the response: {e}')
-    #         return
-        
-    #     bot_response = response.choices[0].text.strip()
-        
-    #     if bot_response:
-    #         await message.reply(response.choices[0].text.replace(f'{bot.user.display_name}: ', ''))
-    #     else:
-    #         await message.reply('wat da heeeeeeel are you talking about')
 
 # LAUNCH
 bot.run(config['token'])                     
