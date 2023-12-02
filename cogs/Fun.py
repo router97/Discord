@@ -167,25 +167,3 @@ def setup(bot: commands.Bot):
     bot.add_cog(Fun(bot))
 
 
-# while True:
-        #     try:
-        #         reaction, user = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
-
-        #         # Fetch the latest version of the message
-        #         poll = await ctx.channel.fetch_message(poll.id)
-
-        #         # Update the message with reaction counts
-        #         reaction_counts = [reaction.count-1 for reaction in poll.reactions]
-        #         total_reactions = sum(reaction_counts)
-                
-        #         reaction_percentages = [(count / total_reactions) * 100 for count in reaction_counts]
-        #         updated_options_str = "\n".join([f"{emoji}: {option} - {count:.1f}%" for emoji, option, count in zip(self.emojis_num, args, reaction_percentages)])
-        #         updated_embed = discord.Embed(title=f"{name}", description=updated_options_str)
-        #         try:
-        #             updated_embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
-        #         except:
-        #             pass
-        #         await poll.edit(embed=updated_embed)
-
-        #     except asyncio.TimeoutError:
-        #         break
