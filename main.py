@@ -9,11 +9,7 @@ from cogs.Info import Info
 from views.rps_buttons import RPS_Buttons
 
 from config import config
-
 from bot import bot
-# from bot import ai_client
-
-
 
 
 # CONTEXT MENUS
@@ -40,8 +36,6 @@ async def rps_context_menu(interaction: discord.Interaction, user: discord.Membe
     await interaction.response.send_message(view=buttons, embed=embed)
 
 
-
-
 # FUNCTIONS
 async def set_bot_activity():
     bot_activity = discord.Activity(type=discord.ActivityType.playing, name="Team Fortress 2")
@@ -55,19 +49,6 @@ async def setup_cogs():
     await bot.tree.sync()
 
 
-class EngineerHelp(commands.MinimalHelpCommand):
-    """Help command."""
-    
-    async def send_pages(self):
-        destination = self.get_destination()
-        for page in self.paginator.pages:
-            embed = discord.Embed(description=page, color=discord.Colour.red())
-            embed.set_image(url=bot.user.avatar.url)
-            await destination.send(embed=embed)
-
-bot.help_command = EngineerHelp()
-
-
 # EVENTS
 @bot.event
 async def on_ready():
@@ -76,12 +57,13 @@ async def on_ready():
     print(f"Logged in as {bot.user.name} ({bot.user.id})")
 
 
-@bot.event
-async def on_message(message: discord.Message):
-    """Message handler."""
+# @bot.event
+# async def on_message(message: discord.Message):
+#     """Message handler."""
     
-    # Checking if the message is a command
-    await bot.process_commands(message)
+#     # Checking if the message is a command
+#     await bot.process_commands(message)
+
 
 # LAUNCH
 bot.run(config['token'])                     

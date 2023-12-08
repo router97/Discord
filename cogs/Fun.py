@@ -7,6 +7,7 @@ from discord.ext import commands
 
 from bot import bot
 from views.rps_buttons import RPS_Buttons
+from views.buttons_ttt import TTT_Buttons
 
 
 
@@ -147,6 +148,28 @@ class Fun(commands.Cog):
         
         # Sending the message
         await ctx.reply(view=buttons, embed=embed)
+    
+    
+    @commands.hybrid_command(name="ttt", description="Tic, Tac, Toe")
+    async def ttt(self, ctx: commands.Context, member: commands.MemberConverter):
+        """Tic, Tac, Toe"""
+        
+        # You can't play with yourself :(
+        if ctx.author == member:
+            return await ctx.reply('typen')
+        
+        # Making an embed
+        embed = discord.Embed(title='Tick, Tack, Toe')
+        
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar)
+        embed.add_field(name='Board', value=':white_large_square::white_large_square::white_large_square:\n'*3)
+        
+        # Setting up the buttons
+        buttons = TTT_Buttons(user1=ctx.author, user2=member)
+        
+        # Sending the message
+        await ctx.reply(view=buttons, embed=embed)
+    
     
     @commands.command()
     async def do(self, ctx: commands.Context, *, activity: str):
