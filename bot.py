@@ -2,7 +2,7 @@
 from discord import Intents
 from discord.ext.commands import Bot
 from config import config
-from openai import OpenAI
+# from openai import OpenAI
 
 # VARIABLES
 intents = Intents.all()

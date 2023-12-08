@@ -5,7 +5,7 @@ import discord
 # BUTTONS
 class TTT_Buttons(discord.ui.View):
     """Tic, Tac, Toe view"""
-    
+
     EMPTY_SYMBOL = '⬜'
     CROSS_SYMBOL = '❌'
     CIRCLE_SYMBOL = '⭕'
@@ -15,11 +15,36 @@ class TTT_Buttons(discord.ui.View):
         self.user1 = user1
         self.user2 = user2
         self.player = user1
-        self.board_map = {
-            '1': None, '2': None, '3': None,
-            '4': None, '5': None, '6': None,
-            '7': None, '8': None, '9': None
-        }
+        self.board_map = {str(i): None for i in range(1, 10)}
+    
+    async def retry(self, interaction: discord.Interaction, button: discord.Button):
+        """Reload everything and begin the game again"""
+        
+        # Check if it's one of the players who pressed the button
+        if interaction.user not in (self.user1, self.user2):
+            return
+        
+        # Reset the board
+        self.board_map = {str(i): None for i in range(1, 10)}
+        
+        # Set the player to the player who began the game in the first place
+        self.player = self.user1
+        
+        # Fetch the old embed
+        embed = interaction.message.embeds[0]
+        
+        # Make an empty board
+        embed.set_field_at(0, name='Board', value=':white_large_square::white_large_square::white_large_square:\n'*3)
+        
+        # Enable all the buttons
+        for callback in self.children:
+            callback.disabled = False
+        
+        # Disable the retry button
+        self.button_retry_callback.disabled = True
+        
+        # Update the message
+        await interaction.response.edit_message(embed=embed, view=self)
     
     async def game_logic(self, board_map: str):
         """Process a string map from embed"""
@@ -42,7 +67,6 @@ class TTT_Buttons(discord.ui.View):
             for check in checking:
                 if check == [TTT_Buttons.CROSS_SYMBOL, TTT_Buttons.CROSS_SYMBOL, TTT_Buttons.CROSS_SYMBOL]:
                     return self.user1.id
-                
                 elif check == [TTT_Buttons.CIRCLE_SYMBOL, TTT_Buttons.CIRCLE_SYMBOL, TTT_Buttons.CIRCLE_SYMBOL]:
                     return self.user2.id
     
@@ -59,7 +83,7 @@ class TTT_Buttons(discord.ui.View):
         # Fetch the old embed
         embed = interaction.message.embeds[0]
         
-        # Generate a board map for the embed
+        # Generate a board for the embed
         board_map_updated = []
         for key, value in self.board_map.items():
             if not value:
@@ -69,9 +93,12 @@ class TTT_Buttons(discord.ui.View):
             elif value == self.user2.id:
                 symbol = TTT_Buttons.CIRCLE_SYMBOL
             board_map_updated.append(symbol)
+        board_map_updated = ''.join(board_map_updated)
         
-        # Split every 3 elements with a new line and formatting it into an embed
-        board_map_updated = ''.join([f"{board_map_updated[counter:counter+3]}\n" for counter in range(0, len(board_map_updated), 3)]).replace('[', '').replace(']', '').replace(', ', '').replace("'", '').replace('"', '')
+        # Split every 3 elements with a new line
+        board_map_updated = '\n'.join([board_map_updated[counter:counter+3] for counter in range(0, len(board_map_updated), 3)])
+        
+        # Update the board field
         embed.set_field_at(0, name='Board', value=board_map_updated)
         
         # Disabling the button
@@ -83,7 +110,10 @@ class TTT_Buttons(discord.ui.View):
         # Check for a draw
         if None not in list(self.board_map.values()):
             await interaction.message.channel.send(f"draw!")
-            return await interaction.message.edit(view=None)
+            for callback in self.children:
+                callback.disabled = True
+            self.button_retry_callback.disabled = False
+            return await interaction.message.edit(view=self)
         
         # Check for a win
         outcome = await self.game_logic(board_map_updated)
@@ -91,13 +121,17 @@ class TTT_Buttons(discord.ui.View):
         # If someone won - send a message and remove the buttons
         if outcome:
             await interaction.message.channel.send(f"<@{outcome}> won!")
-            return await interaction.message.edit(view=None)
-        
+            for callback in self.children:
+                callback.disabled = True
+            self.button_retry_callback.disabled = False
+            return await interaction.message.edit(view=self)
+
         # If the game hasn't ended, change the player
         if self.player == self.user1:
             self.player = self.user2
             return
         self.player = self.user1
+    
     
     @discord.ui.button(label='1', row=0, style=discord.ButtonStyle.primary)
     async def button1_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
@@ -134,3 +168,8 @@ class TTT_Buttons(discord.ui.View):
     @discord.ui.button(label='9', row=2, style=discord.ButtonStyle.primary)
     async def button9_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
         await self.process_button_interaction(interaction, button)
+    
+    
+    @discord.ui.button(label='Retry', row=3, style=discord.ButtonStyle.secondary, disabled=True)
+    async def button_retry_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
+        await self.retry(interaction, button)

@@ -1,9 +1,5 @@
 # IMPORTS
-from sys import path as sys_path
-sys_path.append('D:\\Programm\\Python\\Discord')
-
 import discord
-from discord.ext import commands
 
 
 # BUTTONS

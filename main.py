@@ -1,12 +1,14 @@
 # IMPORTS
 import discord
-from discord.ext import commands
+# from discord.ext import commands
 
 from cogs.Fun import Fun
 from cogs.Moderation import Moderation
 from cogs.Info import Info
 
 from views.rps_buttons import RPS_Buttons
+from views.ttt_buttons import TTT_Buttons
+from views.rr_buttons import RR_Buttons
 
 from config import config
 from bot import bot
@@ -17,14 +19,14 @@ from bot import bot
 async def rps_context_menu(interaction: discord.Interaction, user: discord.Member):
     """Rock, Paper, Scissors context menu."""
     
-    # You can't play with yourself :(
+    # You can't play with yourself
     if interaction.user == user:
         return await interaction.response.send_message('typen', ephemeral=True)
     
     # Making an embed
     embed = discord.Embed(title='Rock, Paper, Scissors')
     
-    embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.avatar.url if interaction.user.avatar else interaction.user.default_avatar)
+    embed.set_author(name=f"{interaction.user.display_name} vs {user.display_name}")
     
     embed.add_field(name=interaction.user.display_name, value='Not Ready')
     embed.add_field(name=user.display_name, value='Not Ready')
@@ -35,13 +37,47 @@ async def rps_context_menu(interaction: discord.Interaction, user: discord.Membe
     # Sending the message
     await interaction.response.send_message(view=buttons, embed=embed)
 
+@bot.tree.context_menu(name='Tic, Tac, Toe')
+async def ttt_context_menu(interaction: discord.Interaction, user: discord.Member):
+    """Tic, Tac, Toe context menu."""
+    
+    # You can't play with yourself
+    if interaction.user == user:
+        return await interaction.response.send_message('typen', ephemeral=True)
+    
+    # Making an embed
+    embed = discord.Embed(title='Tick, Tack, Toe')
+    
+    embed.add_field(name='Board', value=':white_large_square::white_large_square::white_large_square:\n'*3)
+    embed.set_author(name=f"{interaction.user.display_name} vs {user.display_name}")
+    
+    # Setting up the buttons
+    buttons = TTT_Buttons(user1=interaction.user, user2=user)
+    
+    # Sending the message
+    await interaction.response.send_message(view=buttons, embed=embed)
+
+@bot.tree.context_menu(name='Russian Roulette')
+async def rr_context_menu(interaction: discord.Interaction, user: discord.Member):
+    """Russian Roulette context menu."""
+    
+    # You can't play with yourself
+    if interaction.user == user:
+        return await interaction.response.send_message('typen застрелился не так работает', ephemeral=True)
+    
+    # Making an embed
+    embed = discord.Embed(title='Russian Roulette')
+    embed.add_field(name='Turn', value=interaction.user.display_name)
+    embed.set_author(name=f"{interaction.user.display_name} vs {user.display_name}")
+    
+    # Setting up the buttons
+    buttons = RR_Buttons(user1=interaction.user, user2=user)
+    
+    # Sending the message
+    await interaction.response.send_message(view=buttons, embed=embed)
+
 
 # FUNCTIONS
-async def set_bot_activity():
-    bot_activity = discord.Activity(type=discord.ActivityType.playing, name="Team Fortress 2")
-    await bot.change_presence(activity=bot_activity, status=discord.Status.do_not_disturb)
-
-
 async def setup_cogs():
     await bot.add_cog(Fun(bot))
     await bot.add_cog(Moderation(bot))
@@ -52,18 +88,10 @@ async def setup_cogs():
 # EVENTS
 @bot.event
 async def on_ready():
-    await set_bot_activity()
     await setup_cogs()
     print(f"Logged in as {bot.user.name} ({bot.user.id})")
 
 
-# @bot.event
-# async def on_message(message: discord.Message):
-#     """Message handler."""
-    
-#     # Checking if the message is a command
-#     await bot.process_commands(message)
-
-
 # LAUNCH
-bot.run(config['token'])                     
+if __name__ == '__main__':
+    bot.run(config['token'])                     

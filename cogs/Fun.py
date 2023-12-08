@@ -1,23 +1,19 @@
 # IMPORTS
-import asyncio
 from random import randint, choice
 
 import discord
 from discord.ext import commands
 
-from bot import bot
 from views.rps_buttons import RPS_Buttons
-from views.buttons_ttt import TTT_Buttons
-
+from views.ttt_buttons import TTT_Buttons
+from views.rr_buttons import RR_Buttons
 
 
 # COG
 class Fun(commands.Cog):
     """Miscellaneous commands"""
     
-    
     emojis_num = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')
-    
     fakt_map = {
         'a': 'ф', 'b': 'и', 'c': 'с', 'd': 'в', 'e': 'у', 'f': 'а', 'g': 'п', 'h': 'р',
         'i': 'ш', 'j': 'о', 'k': 'л', 'l': 'д', 'm': 'ь', 'n': 'т', 'o': 'щ', 'p': 'з',
@@ -25,7 +21,6 @@ class Fun(commands.Cog):
         'y': 'н', 'z': 'я', ',': 'б', '.': 'ю', '[': 'х', ']': 'ъ', "'": 'э', '`': 'ё',
         ' ': ' '
     }
-    
     random_replies = [
         "I'm good", 
         "KYS = Keep Yourself Safe", 
@@ -88,21 +83,14 @@ class Fun(commands.Cog):
         try:
             start, finish = int(start), int(finish)
         except ValueError:
-            return await ctx.reply("invalid typen")
+            return await ctx.reply("invalid тупень")
         
-        # Check if start is bigger than the finish
-        if start > finish:
-            return await ctx.reply("Start should be less than or equal to finish.")
-        
-        # Check if start is equal to finish
-        if start == finish:
-            return await ctx.reply("guess the answer.")
-
-        # Generate the random number
-        random_number = randint(start, finish)
+        # Check if start is equal to finish or the same
+        if start == finish or start > finish:
+            return await ctx.reply("тупень инvalid")
         
         # Send it
-        await ctx.reply(f"{random_number}")
+        await ctx.reply(f"{randint(start, finish)}")
     
     @commands.hybrid_command(name="randmember", description="Ping a random member from the guild")
     async def randmember(self, ctx: commands.Context):
@@ -114,9 +102,9 @@ class Fun(commands.Cog):
         # Send a random member from the list
         await ctx.reply(f"<@{choice(real_members_ids)}>")
     
-    @commands.hybrid_command(name="fakt", description="Faktorizaciya verh")
+    @commands.hybrid_command(name="fakt", description="Faktorizaciya")
     async def fakt(self, ctx: commands.Context):
-        """Faktorizaciya niz"""
+        """Faktorizaciya"""
         
         # Getting the fakt
         fakt = ctx.message.content.replace('.fakt ', '', 1).casefold()
@@ -131,14 +119,14 @@ class Fun(commands.Cog):
     async def rps(self, ctx: commands.Context, member: commands.MemberConverter):
         """Rock, Paper, Scissors"""
         
-        # You can't play with yourself :(
+        # You can't play with yourself
         if ctx.author == member:
             return await ctx.reply('typen')
         
         # Making an embed
         embed = discord.Embed(title='Rock, Paper, Scissors')
         
-        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar)
+        embed.set_author(name=f"{ctx.author.display_name} vs {member.display_name}")
         
         embed.add_field(name=ctx.author.display_name, value='Not Ready')
         embed.add_field(name=member.display_name, value='Not Ready')
@@ -149,27 +137,44 @@ class Fun(commands.Cog):
         # Sending the message
         await ctx.reply(view=buttons, embed=embed)
     
-    
     @commands.hybrid_command(name="ttt", description="Tic, Tac, Toe")
     async def ttt(self, ctx: commands.Context, member: commands.MemberConverter):
         """Tic, Tac, Toe"""
         
-        # You can't play with yourself :(
+        # You can't play with yourself
         if ctx.author == member:
-            return await ctx.reply('typen')
+            return await ctx.reply('typen в крестики нолики сигма сам с собой поиграть хотел, проиграешь, даже не пытайся')
         
         # Making an embed
         embed = discord.Embed(title='Tick, Tack, Toe')
-        
-        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar)
+
         embed.add_field(name='Board', value=':white_large_square::white_large_square::white_large_square:\n'*3)
+        embed.set_author(name=f"{ctx.author.display_name} vs {member.display_name}")
         
         # Setting up the buttons
         buttons = TTT_Buttons(user1=ctx.author, user2=member)
         
         # Sending the message
         await ctx.reply(view=buttons, embed=embed)
-    
+
+    @commands.hybrid_command(name="rr", description="Russian Roulette")
+    async def rr(self, ctx: commands.Context, member: commands.MemberConverter):
+        """Russian Roulette"""
+        
+        # You can't play with yourself
+        if ctx.author == member:
+            return await ctx.reply('typen застрелился не так работает')
+        
+        # Making an embed
+        embed = discord.Embed(title='Russian Roulette')
+        embed.add_field(name='Turn', value=ctx.author.display_name)
+        embed.set_author(name=f"{ctx.author.display_name} vs {member.display_name}")
+        
+        # Setting up the buttons
+        buttons = RR_Buttons(user1=ctx.author, user2=member)
+        
+        # Sending the message
+        await ctx.reply(view=buttons, embed=embed)
     
     @commands.command()
     async def do(self, ctx: commands.Context, *, activity: str):

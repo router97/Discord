@@ -1,22 +1,14 @@
 # IMPORTS
-from sys import path as sys_path
-sys_path.append('D:\\Programm\\Python\\Discord')
-
-import discord
-from discord.ext import commands
-
-from bot import bot
 from random import choice
 
-# from bot import ai_client
+import discord
+
+from bot import bot
+
 
 # BUTTONS
 class RPS_Buttons(discord.ui.View):
     """Rock, Paper, Scissors buttons"""
-    pick = {}
-    user1 = discord.Member
-    user2 = discord.Member
-    __winning_combinations = {}
     
     def __init__(self, user1: discord.Member, user2: discord.Member):
         super().__init__() 
@@ -33,7 +25,6 @@ class RPS_Buttons(discord.ui.View):
             ('scissors', 'paper'): self.user1.display_name,
         }
     
-    
     def game_logic(self) -> str:
         """Basic game logic for Rock, Paper, Scissors"""
         
@@ -48,7 +39,6 @@ class RPS_Buttons(discord.ui.View):
         # Check who won
         if (pick1, pick2) in self.__winning_combinations:
             return f"{self.__winning_combinations[(pick1, pick2)]} won!"
-    
     
     async def interaction_check_rps(self, interaction: discord.interactions.Interaction, pick: str) -> None:
         """Rock, Paper, Scissors pick handler"""
@@ -80,7 +70,6 @@ class RPS_Buttons(discord.ui.View):
             # Clear everything
             await interaction.message.edit(view=None)
     
-    
     def generate_embed(self) -> discord.Embed:
         """Generate the game embed"""
         
@@ -95,11 +84,9 @@ class RPS_Buttons(discord.ui.View):
     async def rock_button_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
         await self.interaction_check_rps(interaction, 'rock')
 
-    
     @discord.ui.button(label='paper', emoji="📄", row=0, style=discord.ButtonStyle.primary)
     async def paper_button_callback(self, interaction: discord.interactions.Interaction, button):
         await self.interaction_check_rps(interaction, 'paper')
-    
     
     @discord.ui.button(label='scissors', emoji="✂️", row=0, style=discord.ButtonStyle.primary)
     async def scissors_button_callback(self, interaction: discord.interactions.Interaction, button):

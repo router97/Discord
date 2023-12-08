@@ -9,9 +9,6 @@ from discord.ext import commands
 class Info(commands.Cog):
     """Information commands"""
     
-    
-    bot = commands.Bot
-    
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     
@@ -164,8 +161,6 @@ class Info(commands.Cog):
         
         # Sending the message
         await ctx.reply(embed=embed)
-    
-
 
 
 # SETUP
