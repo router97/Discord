@@ -43,7 +43,7 @@ async def ttt_context_menu(interaction: discord.Interaction, user: discord.Membe
         return await interaction.response.send_message('typen', ephemeral=True)
     
     # Making an embed
-    embed = discord.Embed(title='Tick, Tack, Toe')
+    embed = discord.Embed(title='Tick, Tack, Toe', color=discord.Color.red())
     
     embed.add_field(name='Board', value=':white_large_square::white_large_square::white_large_square:\n'*3)
     embed.set_author(name=f"{interaction.user.display_name} vs {user.display_name}")

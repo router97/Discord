@@ -15,8 +15,23 @@ class TTT_Buttons(discord.ui.View):
         self.user1 = user1
         self.user2 = user2
         self.player = user1
-        self.board_map = {str(i): None for i in range(1, 10)}
-    
+        self.board_map = {str(i): self.EMPTY_SYMBOL for i in range(1, 10)}
+        button_data = [
+            ('1', 0),
+            ('2', 0),
+            ('3', 0),
+            ('4', 1),
+            ('5', 1),
+            ('6', 1),
+            ('7', 2),
+            ('8', 2),
+            ('9', 2),
+        ]
+        for label, row in button_data:
+            button = discord.ui.Button(label=label, row=row, style=discord.ButtonStyle.primary, custom_id=label)
+            button.callback = self.callback
+            self.add_item(button)
+            
     async def retry(self, interaction: discord.Interaction, button: discord.Button):
         """Reload everything and begin the game again"""
         
@@ -24,11 +39,11 @@ class TTT_Buttons(discord.ui.View):
         if interaction.user not in (self.user1, self.user2):
             return
         
-        # Reset the board
-        self.board_map = {str(i): None for i in range(1, 10)}
-        
-        # Set the player to the player who began the game in the first place
+        # Set the player to the player who began the game
         self.player = self.user1
+        
+        # Reset the board
+        self.board_map = {str(i): self.EMPTY_SYMBOL for i in range(1, 10)}
         
         # Fetch the old embed
         embed = interaction.message.embeds[0]
@@ -70,33 +85,24 @@ class TTT_Buttons(discord.ui.View):
                 elif check == [TTT_Buttons.CIRCLE_SYMBOL, TTT_Buttons.CIRCLE_SYMBOL, TTT_Buttons.CIRCLE_SYMBOL]:
                     return self.user2.id
     
-    async def process_button_interaction(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        """Process button interaction"""
+    async def callback(self, interaction: discord.Interaction):
         
         # Check if it's the user's move
         if interaction.user != self.player:
             return
         
-        # Update the game map
-        self.board_map.update({button.label: interaction.user.id})
+        # Fetch the button object
+        button = next(item for item in self.children if item.custom_id == interaction.data['custom_id'])
         
+        # Update the game map
+        self.board_map.update({button.label: self.CROSS_SYMBOL if interaction.user == self.user1 else self.CIRCLE_SYMBOL})
+    
         # Fetch the old embed
         embed = interaction.message.embeds[0]
         
-        # Generate a board for the embed
-        board_map_updated = []
-        for key, value in self.board_map.items():
-            if not value:
-                symbol=TTT_Buttons.EMPTY_SYMBOL
-            elif value == self.user1.id:
-                symbol = TTT_Buttons.CROSS_SYMBOL
-            elif value == self.user2.id:
-                symbol = TTT_Buttons.CIRCLE_SYMBOL
-            board_map_updated.append(symbol)
-        board_map_updated = ''.join(board_map_updated)
-        
         # Split every 3 elements with a new line
-        board_map_updated = '\n'.join([board_map_updated[counter:counter+3] for counter in range(0, len(board_map_updated), 3)])
+        board_map_updated = list(self.board_map.values())
+        board_map_updated = '\n'.join([''.join(board_map_updated[counter:counter+3]) for counter in range(0, len(board_map_updated), 3)])
         
         # Update the board field
         embed.set_field_at(0, name='Board', value=board_map_updated)
@@ -107,13 +113,6 @@ class TTT_Buttons(discord.ui.View):
         # Updating the message with a new embed and buttons
         await interaction.response.edit_message(embed=embed, view=self)
         
-        # Check for a draw
-        if None not in list(self.board_map.values()):
-            await interaction.message.channel.send(f"draw!")
-            for callback in self.children:
-                callback.disabled = True
-            self.button_retry_callback.disabled = False
-            return await interaction.message.edit(view=self)
         
         # Check for a win
         outcome = await self.game_logic(board_map_updated)
@@ -126,49 +125,16 @@ class TTT_Buttons(discord.ui.View):
             self.button_retry_callback.disabled = False
             return await interaction.message.edit(view=self)
 
-        # If the game hasn't ended, change the player
-        if self.player == self.user1:
-            self.player = self.user2
-            return
-        self.player = self.user1
-    
-    
-    @discord.ui.button(label='1', row=0, style=discord.ButtonStyle.primary)
-    async def button1_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-
-    @discord.ui.button(label='2', row=0, style=discord.ButtonStyle.primary)
-    async def button2_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-    
-    @discord.ui.button(label='3', row=0, style=discord.ButtonStyle.primary)
-    async def button3_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-    
-    @discord.ui.button(label='4', row=1, style=discord.ButtonStyle.primary)
-    async def button4_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-
-    @discord.ui.button(label='5', row=1, style=discord.ButtonStyle.primary)
-    async def button5_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-    
-    @discord.ui.button(label='6', row=1, style=discord.ButtonStyle.primary)
-    async def button6_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-    
-    @discord.ui.button(label='7', row=2, style=discord.ButtonStyle.primary)
-    async def button7_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-
-    @discord.ui.button(label='8', row=2, style=discord.ButtonStyle.primary)
-    async def button8_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-    
-    @discord.ui.button(label='9', row=2, style=discord.ButtonStyle.primary)
-    async def button9_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.process_button_interaction(interaction, button)
-    
+        # Check for a draw
+        if self.EMPTY_SYMBOL not in board_map_updated:
+            await interaction.message.channel.send(f"draw!")
+            for callback in self.children:
+                callback.disabled = True
+            self.button_retry_callback.disabled = False
+            return await interaction.message.edit(view=self)
+        
+        # Change the player
+        self.player = self.user1 if self.player == self.user2 else self.user2
     
     @discord.ui.button(label='Retry', row=3, style=discord.ButtonStyle.secondary, disabled=True)
     async def button_retry_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):

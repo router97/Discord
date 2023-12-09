@@ -143,7 +143,7 @@ class Fun(commands.Cog):
             return await ctx.reply('typen в крестики нолики сигма сам с собой поиграть хотел, проиграешь, даже не пытайся')
         
         # Making an embed
-        embed = discord.Embed(title='Tick, Tack, Toe')
+        embed = discord.Embed(title='Tick, Tack, Toe', color=discord.Color.red())
 
         embed.add_field(name='Board', value=':white_large_square::white_large_square::white_large_square:\n'*3)
         embed.set_author(name=f"{ctx.author.display_name} vs {member.display_name}")
