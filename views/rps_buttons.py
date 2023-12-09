@@ -76,15 +76,6 @@ class RPS_Buttons(discord.ui.View):
         # Clear the buttons
         await interaction.message.edit(view=None)
     
-    async def generate_embed(self) -> discord.Embed:
-        """Generate the game embed"""
-        
-        embed = discord.Embed(title='Rock, Paper, Scissors')
-        
-        embed.add_field(name=self.user1.display_name, value='Ready' if self.user1 in self.pick else 'Not Ready')
-        embed.add_field(name=self.user2.display_name, value='Ready' if self.user2 in self.pick else 'Not Ready')
-        return embed
-    
     
     @discord.ui.button(label='rock', emoji="🗿", row=0, style=discord.ButtonStyle.primary)
     async def rock_button_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):

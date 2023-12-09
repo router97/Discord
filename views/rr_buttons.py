@@ -8,7 +8,7 @@ import discord
 class RR_Buttons(discord.ui.View):
     """Russian Roulette"""
     
-    BULLET_SYMBOL = '⁍'
+    BULLET_SYMBOL = '⦿'
     
     def __init__(self, user1: discord.Member, user2: discord.Member):
         super().__init__()
@@ -44,7 +44,7 @@ class RR_Buttons(discord.ui.View):
         embed_new = interaction.message.embeds[0]
         if not outcome:
             embed_new.set_field_at(0, name='Turn', value=self.player.display_name)
-            embed_new.set_field_at(1, name='Barrel', value='⦿'*len(self.barrel))
+            embed_new.set_field_at(1, name='Barrel', value=self.BULLET_SYMBOL*len(self.barrel))
 
         # If someone lost - send a message and remove the buttons
         else:
