@@ -125,9 +125,6 @@ class Fun(commands.Cog):
         
         # Making an embed
         embed = discord.Embed(title='Rock, Paper, Scissors')
-        
-        embed.set_author(name=f"{ctx.author.display_name} vs {member.display_name}")
-        
         embed.add_field(name=ctx.author.display_name, value='Not Ready')
         embed.add_field(name=member.display_name, value='Not Ready')
         
@@ -168,6 +165,7 @@ class Fun(commands.Cog):
         # Making an embed
         embed = discord.Embed(title='Russian Roulette')
         embed.add_field(name='Turn', value=ctx.author.display_name)
+        embed.add_field(name='Barrel', value='⦿⦿⦿⦿⦿⦿')
         embed.set_author(name=f"{ctx.author.display_name} vs {member.display_name}")
         
         # Setting up the buttons

@@ -25,8 +25,8 @@ class RPS_Buttons(discord.ui.View):
             ('scissors', 'paper'): self.user1.display_name,
         }
     
-    def game_logic(self) -> str:
-        """Basic game logic for Rock, Paper, Scissors"""
+    async def game_logic(self) -> str:
+        """Game logic for Rock, Paper, Scissors"""
         
         # Fetch the picks
         pick1 = self.pick[self.user1]
@@ -44,37 +44,43 @@ class RPS_Buttons(discord.ui.View):
         """Rock, Paper, Scissors pick handler"""
         
         # Check if the user is a player
-        if interaction.user in (self.user1, self.user2):
+        if interaction.user not in (self.user1, self.user2):
+            return
             
-            # Accept interaction
-            await interaction.response.defer()
+        # Accept interaction
+        await interaction.response.defer()
+        
+        # Generate a response, if the player is the bot
+        if self.user2 == bot.user:
+            self.pick.update({self.user2: choice(['rock', 'paper', 'scissors'])})
             
-            # Generate a response, if the player is the bot
-            if self.user2 == bot.user:
-                self.pick.update({self.user2: choice(['rock', 'paper', 'scissors'])})
-                
-            # Save the pick
-            self.pick.update({interaction.user: pick})
-            await interaction.message.edit(embed=self.generate_embed())
-            
-            # Check if both users are ready
-            if len(self.pick) != 2:
-                return
-            
-            # Check for game outcome
-            outcome = self.game_logic()
-            
-            # Provide results
-            await interaction.message.reply(f"{outcome}\n{self.user1.display_name} picked {self.pick[self.user1]}, {self.user2.display_name} picked {self.pick[self.user2]}")
-            
-            # Clear everything
-            await interaction.message.edit(view=None)
+        # Save the pick
+        self.pick.update({interaction.user: pick})
+        
+        # Update the embed
+        embed = interaction.message.embeds[0]
+        embed.set_field_at(0, name=self.user1.display_name, value='Ready' if self.user1 in self.pick else 'Not Ready')
+        embed.set_field_at(1, name=self.user2.display_name, value='Ready' if self.user2 in self.pick else 'Not Ready')
+        await interaction.message.edit(embed=embed)
+        
+        # Check if both users are ready
+        if len(self.pick) != 2:
+            return
+        
+        # Check for game outcome
+        outcome = await self.game_logic()
+        
+        # Provide results
+        await interaction.message.reply(f"{outcome}\n{self.user1.display_name} picked {self.pick[self.user1]}, {self.user2.display_name} picked {self.pick[self.user2]}")
+        
+        # Clear the buttons
+        await interaction.message.edit(view=None)
     
-    def generate_embed(self) -> discord.Embed:
+    async def generate_embed(self) -> discord.Embed:
         """Generate the game embed"""
         
         embed = discord.Embed(title='Rock, Paper, Scissors')
-        embed.set_author(name=self.user1.display_name, icon_url=self.user1.avatar.url if self.user1.avatar else self.user1.default_avatar)
+        
         embed.add_field(name=self.user1.display_name, value='Ready' if self.user1 in self.pick else 'Not Ready')
         embed.add_field(name=self.user2.display_name, value='Ready' if self.user2 in self.pick else 'Not Ready')
         return embed

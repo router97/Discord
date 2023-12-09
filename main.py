@@ -1,6 +1,5 @@
 # IMPORTS
 import discord
-# from discord.ext import commands
 
 from cogs.Fun import Fun
 from cogs.Moderation import Moderation
@@ -25,8 +24,6 @@ async def rps_context_menu(interaction: discord.Interaction, user: discord.Membe
     
     # Making an embed
     embed = discord.Embed(title='Rock, Paper, Scissors')
-    
-    embed.set_author(name=f"{interaction.user.display_name} vs {user.display_name}")
     
     embed.add_field(name=interaction.user.display_name, value='Not Ready')
     embed.add_field(name=user.display_name, value='Not Ready')
@@ -68,6 +65,7 @@ async def rr_context_menu(interaction: discord.Interaction, user: discord.Member
     # Making an embed
     embed = discord.Embed(title='Russian Roulette')
     embed.add_field(name='Turn', value=interaction.user.display_name)
+    embed.add_field(name='Barrel', value='⦿⦿⦿⦿⦿⦿')
     embed.set_author(name=f"{interaction.user.display_name} vs {user.display_name}")
     
     # Setting up the buttons
