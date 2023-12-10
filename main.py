@@ -92,4 +92,4 @@ async def on_ready():
 
 # LAUNCH
 if __name__ == '__main__':
-    bot.run(config['token'])                     
+    bot.run(config['token'])

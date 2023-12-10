@@ -15,7 +15,6 @@ class RPS_Buttons(discord.ui.View):
         self.user1 = user1
         self.user2 = user2
         self.pick = {}
-        
         self.__winning_combinations = {
             ('rock', 'paper'): self.user2.display_name,
             ('rock', 'scissors'): self.user1.display_name,
@@ -40,20 +39,17 @@ class RPS_Buttons(discord.ui.View):
         if (pick1, pick2) in self.__winning_combinations:
             return f"{self.__winning_combinations[(pick1, pick2)]} won!"
     
-    async def interaction_check_rps(self, interaction: discord.interactions.Interaction, pick: str) -> None:
+    async def process_interaction(self, interaction: discord.interactions.Interaction, pick: str):
         """Rock, Paper, Scissors pick handler"""
         
         # Check if the user is a player
         if interaction.user not in (self.user1, self.user2):
             return
-            
-        # Accept interaction
-        await interaction.response.defer()
         
         # Generate a response, if the player is the bot
         if self.user2 == bot.user:
             self.pick.update({self.user2: choice(['rock', 'paper', 'scissors'])})
-            
+        
         # Save the pick
         self.pick.update({interaction.user: pick})
         
@@ -62,6 +58,9 @@ class RPS_Buttons(discord.ui.View):
         embed.set_field_at(0, name=self.user1.display_name, value='Ready' if self.user1 in self.pick else 'Not Ready')
         embed.set_field_at(1, name=self.user2.display_name, value='Ready' if self.user2 in self.pick else 'Not Ready')
         await interaction.message.edit(embed=embed)
+        
+        # Accept interaction
+        await interaction.response.defer()
         
         # Check if both users are ready
         if len(self.pick) != 2:
@@ -76,15 +75,14 @@ class RPS_Buttons(discord.ui.View):
         # Clear the buttons
         await interaction.message.edit(view=None)
     
-    
     @discord.ui.button(label='rock', emoji="🗿", row=0, style=discord.ButtonStyle.primary)
     async def rock_button_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
-        await self.interaction_check_rps(interaction, 'rock')
+        await self.process_interaction(interaction, button.label)
 
     @discord.ui.button(label='paper', emoji="📄", row=0, style=discord.ButtonStyle.primary)
-    async def paper_button_callback(self, interaction: discord.interactions.Interaction, button):
-        await self.interaction_check_rps(interaction, 'paper')
+    async def paper_button_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
+        await self.process_interaction(interaction, button.label)
     
     @discord.ui.button(label='scissors', emoji="✂️", row=0, style=discord.ButtonStyle.primary)
-    async def scissors_button_callback(self, interaction: discord.interactions.Interaction, button):
-        await self.interaction_check_rps(interaction, 'scissors')
+    async def scissors_button_callback(self, interaction: discord.interactions.Interaction, button: discord.ui.Button):
+        await self.process_interaction(interaction, button.label)
