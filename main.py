@@ -89,7 +89,7 @@ async def on_ready():
     await setup_cogs()
     print(f"Logged in as {bot.user.name} ({bot.user.id})")
 
- 
+
 # LAUNCH
 if __name__ == '__main__':
     bot.run(config['token'])
