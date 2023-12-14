@@ -6,17 +6,7 @@ import discord
 class TTT_Buttons(discord.ui.View):
     """Tic, Tac, Toe view"""
 
-    EMPTY_SYMBOL = '⬜'
-    CROSS_SYMBOL = '❌'
-    CIRCLE_SYMBOL = '⭕'
-    
-    def __init__(self, user1: discord.Member, user2: discord.Member):
-        super().__init__()
-        self.user1 = user1
-        self.user2 = user2
-        self.player = user1
-        self.board_map = {str(i): self.EMPTY_SYMBOL for i in range(1, 10)}
-        button_data = [
+    _button_data = [
             ('1', 0),
             ('2', 0),
             ('3', 0),
@@ -27,7 +17,17 @@ class TTT_Buttons(discord.ui.View):
             ('8', 2),
             ('9', 2),
         ]
-        for label, row in button_data:
+    EMPTY_SYMBOL = '⬜'
+    CROSS_SYMBOL = '❌'
+    CIRCLE_SYMBOL = '⭕'
+    
+    def __init__(self, user1: discord.Member, user2: discord.Member):
+        super().__init__()
+        self.user1 = user1
+        self.user2 = user2
+        self.player = user1
+        self.board_map = {str(i): self.EMPTY_SYMBOL for i in range(1, 10)}
+        for label, row in self._button_data:
             button = discord.ui.Button(label=label, row=row, style=discord.ButtonStyle.primary, custom_id=label)
             button.callback = self.callback
             self.add_item(button)

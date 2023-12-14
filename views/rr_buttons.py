@@ -5,6 +5,7 @@ import discord
 
 from bot import bot
 
+
 # BUTTONS
 class RR_Buttons(discord.ui.View):
     """Russian Roulette"""
